@@ -1,17 +1,15 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import Cell from "./components/Cell";
+import React, { useEffect, useState } from 'react';
+import { getDiagonals } from "./utils/utils";
+import "bootstrap/dist/css/bootstrap.min.css";
+import Button from 'react-bootstrap/Button';
+import { ResultModal } from "./components/ResultModal"
+import { IHistory } from "./models/Models";
+import { HistoryList } from "./components/HistoryList";
 
 enum cellState {empty = "", x = "X", o = "O"}
 
-enum player {x = "X", y = "O"}
+enum players {x = "X", y = "O"}
 
-interface IHistory {
-	x: number,
-	y: number,
-	nextPlayer: string,
-	gridMask: Array<Array<string>>,
-	// active: boolean
-}
 
 const gridMarkup: Array<Array<string>> = [
 	[cellState.empty, cellState.empty, cellState.empty],
@@ -21,16 +19,74 @@ const gridMarkup: Array<Array<string>> = [
 
 function App() {
 	const [grid, setGrid] = useState(gridMarkup);
-	const [nextPlayerTurn, setNextPlayerTurn] = useState(player.x as string);
+	const [nextPlayerTurn, setNextPlayerTurn] = useState(players.x as string);
 	const [history, setHistory] = useState([] as IHistory[]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
+	const [winner, setWinner] = useState<string | null>(null);
+	const [modalVisible, setModalVisible] = useState(false);
 
-	// useEffect(
-	// 	() => {
-	// 		console.log("----", "grid listener..")
-	// 	},
-	// 	[grid],
-	// );
+	const handleCloseModal = () => setModalVisible(false);
+	const handleShowModal = () => setModalVisible(true);
+
+	useEffect(() => {
+			if (history.length > 0) { // проверить на вин кондишн
+				const flat = grid.flat(1);
+
+				checkHorizontal(flat);
+				checkVertical(flat);
+				checkDiagonals(grid);
+			}
+		}, [grid],
+	);
+
+	useEffect(() => {
+		if (winner)
+			handleShowModal()
+	}, [winner]);
+
+	function checkHorizontal(arr: string[]) {
+		const checkFrom = [0, 3, 6];
+
+		checkFrom.forEach(index => {
+			const chunk = arr.slice(index, index + 3);
+
+			// проверям каждого из !2х! игроков 
+			Object.values(players).forEach(player => {
+				if (chunk.every(char => char === player)) {
+					setWinner(player)
+				}
+			})
+		})
+	}
+
+	function checkVertical(arr: string[]) {
+		const checkFrom = [0, 1, 2];
+
+		checkFrom.forEach(checkIndex => {
+			const chunk = arr.slice(checkIndex).filter((value, index) => index % 3 === 0)
+
+			Object.values(players).forEach(player => {
+				if (chunk.every(char => char === player)) {
+					setWinner(player);
+				}
+			})
+		})
+	}
+
+	function checkDiagonals(arr: Array<Array<string>>) {
+		const diagonals = getDiagonals(arr);
+
+		diagonals.forEach(diagonal => {
+			Object.values(players).forEach(player => {
+				if (diagonal.every(char => char === player)) {
+					// console.log("----", "win diagonal")
+					setWinner(player)
+					return
+				}
+			})
+		})
+
+	}
 
 
 	const updatedGrid = (rowIndex: number, columnIndex: number, newValue: string) => {
@@ -42,10 +98,10 @@ function App() {
 
 	function getNextPlayer(historyPlayer?: string): string {
 		if (historyPlayer) {
-			return historyPlayer === player.x ? player.y : player.x;
+			return historyPlayer === players.x ? players.y : players.x;
 		}
 
-		return nextPlayerTurn === player.x ? player.y : player.x;
+		return nextPlayerTurn === players.x ? players.y : players.x;
 	}
 
 	const cellReady = (x: number, y: number) => grid[x][y] === "";
@@ -54,11 +110,12 @@ function App() {
 		if (cellReady(x, y)) {
 			const newGrid = updatedGrid(x, y, nextPlayerTurn);
 			const nextPlayer = getNextPlayer();
-
 			setGrid(newGrid)
 			setNextPlayerTurn(nextPlayer)
 
-			setHistory(prev => [...prev, { x, y, gridMask: grid.map(item => [...item]), nextPlayer }])
+			setHistory(prev => [...prev.slice(0, historyIndex + 1), {
+				x, y, gridMask: grid.map(item => [...item]), nextPlayer
+			}])
 			setHistoryIndex(prev => prev + 1);
 		}
 	}
@@ -70,10 +127,10 @@ function App() {
 	};
 
 	return (
-		<div className="max-w-[600px] mx-auto mt-[100px]">
+		<div className="container-sm pt-[100px]">
 			<div className={ "grid grid-cols-2" }>
 				<div className="leftbar">
-					<div>Next player turn: <b className={ "font-bold" }>"{ nextPlayerTurn }"</b></div>
+					<h3>Next player turn: <b className={ "font-bold" }>"{ nextPlayerTurn }"</b></h3>
 
 					<div className="grid mt-4">
 						{ grid.map((row, xIndex) =>
@@ -81,7 +138,7 @@ function App() {
 								{
 									row.map((value, yIndex) => (
 										<button
-											className={ "inline-block w-[50px] h-[50px] border" }
+											className={ "inline-block w-[90px] h-[90px] border text-2xl" }
 											key={ `${ xIndex }${ yIndex }` }
 											onClick={ () => clickHandler(xIndex, yIndex) }>
 											{ value }
@@ -94,23 +151,16 @@ function App() {
 				</div>
 
 				<div className="rightbar">
-					<h5 className="font-bold">History:</h5>
-					<ol className="history mt-4">
-						{ !history.length && <li>no records</li> }
+					<h2 className={ "mb-4" }>History:</h2>
 
-						{ history.map(({ x, y, gridMask, nextPlayer }, index) =>
-							<li key={ index } className={ "mt-2 list-decimal" }>
-								<button
-									className={ `px-3 py-1 bg-blue-400 text-white rounded select-none` }
-									onClick={ () => historyHandler(gridMask, nextPlayer, index) }>
-									Turn of player "{ nextPlayer }"; coords: x={ x }, y={ y }
-								</button>
-								{ historyIndex === index && <span className={"text-xl ml-1"}>←</span> }
-							</li>
-						) }
-					</ol>
+					<HistoryList historyList={ history }
+					             clickHanlder={ historyHandler }
+					             historyIndex={ historyIndex }
+					/>
 				</div>
 			</div>
+			
+			<ResultModal winnerName={ winner } visibility={ modalVisible } onHideHandler={ handleCloseModal } />
 		</div>
 	);
 }
