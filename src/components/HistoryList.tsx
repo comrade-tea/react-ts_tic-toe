@@ -1,31 +1,41 @@
-import { IHistory } from "../models/Models";
-import { Button } from "react-bootstrap";
+import {Cell, IHistoryRecord, Players} from "../models/Models";
+import {Button} from "react-bootstrap";
+import {FC} from "react";
 
 interface HistoryListProps {
-	historyList: IHistory[],
+	historyList: IHistoryRecord[],
 	historyIndex: number,
 
-	clickHanlder(gridMask: Array<Array<string>>, player: string, index: number): void
+	clickHanlder(gridMask: Array<Array<Cell>>, player: number, index: number): void
 }
 
-export function HistoryList({ historyList, historyIndex, clickHanlder }: HistoryListProps) {
+export const HistoryList: FC<HistoryListProps> = ({historyList, historyIndex, clickHanlder}) => {
+
+	if (!historyList.length)
+		return <span>no records</span>
+
+
 	return (
-		<ol className="history">
-			{ !historyList.length && <li>no records</li> }
-			{ historyList.map(({ x, y, gridMask, nextPlayer }, index) => {
+		<ol className={"ps-0"}>
+			{historyList.map(({x, y, gridMask, nextPlayer}, index) => {
 					const currentItem = historyIndex === index;
-					return <li key={ index } className={ "mt-2 list-decimal" }>
-						<Button
-							className={ `btn  select-none ${ currentItem ? "btn-dark" : "btn-light" }` }
-							onClick={ () => clickHanlder(gridMask, nextPlayer, index) }>
 
-							Turn of player "{ nextPlayer }"; coords: x={ x }, y={ y }
+					const btnClasses = `btn select-none ${currentItem ? "btn-dark" : "btn-light"}`;
+					
+					return (
+						<li key={index} className={"flex align-items-center mt-3 list-decimal list-inside"}>
+							<Button
+								className={btnClasses}
+								onClick={() => clickHanlder(gridMask, nextPlayer, index)}>
 
-						</Button>
-						{ currentItem && <span className={ "text-xl ml-1" }>←</span> }
-					</li>;
+								Turn of player "{Players[nextPlayer]}"; coords: x={x}, y={y}
+							</Button>
+
+							{currentItem && <span className={"text-3xl ms-2"}>←</span>}
+						</li>
+					)
 				}
-			) }
+			)}
 		</ol>
 	)
 }
