@@ -73,7 +73,7 @@ function App() {
 		for (let i = 0; i < gameOptions.gridSize; i++) {
 			checkFromIndex.push(gameOptions.gridSize * i)
 		}
-		console.log("--horizontal indexes--", checkFromIndex)
+		//  console.log("--horizontal indexes ✔--", checkFromIndex)
 		
 		checkFromIndex.forEach(index => {
 			const line = arr.slice(index, index + gameOptions.gridSize);
@@ -94,7 +94,7 @@ function App() {
 		checkFromIndex.forEach(checkIndex => {
 			const line = arr
 				.slice(checkIndex)
-				.filter((value, index) => index % 3 === 0)
+				.filter((value, index) => index % gameOptions.gridSize === 0)
 
 			checkWinCondition(line)
 		})
