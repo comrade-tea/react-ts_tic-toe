@@ -12,15 +12,28 @@ const CellGrid: FC<ICellGrid> = ({grid, clickHandler}) => {
 			{grid.map((row, xIndex) =>
 				<div className="flex" key={xIndex}>
 					{
-						row.map((value, yIndex) => (
-							<button
-								className={"inline-block w-[100px] h-[100px] border text-4xl font-bold"}
-								key={`${xIndex}${yIndex}`}
-								onClick={() => clickHandler(xIndex, yIndex)}>
-								
-								{value !== Cell.empty && Players[value].toUpperCase()}
-							</button>
-						))
+						row.map((value, yIndex) => {
+							const cellStyles = ["w-[100px]", "h-[100px]", "border", "text-4xl", "font-bold", "transition", "flex"]
+							const cellIsEmpty = value === Cell.empty;
+							
+							if (cellIsEmpty) {
+								cellStyles.push("hover:bg-gray-100 cursor-pointer")
+							} else {
+								cellStyles.push("cursor-default")
+							}
+							
+							return (
+								<div
+									className={cellStyles.join(" ")}
+									key={`${xIndex}${yIndex}`}
+									onClick={() => clickHandler(xIndex, yIndex)}>
+
+									<span className={"m-auto"}>
+										{!cellIsEmpty && Players[value].toUpperCase()}
+									</span>
+								</div>
+							);
+						})
 					}
 				</div>
 			)}

@@ -18,3 +18,5 @@ export interface IGameOptions {
 	maxGridSize: number
 	firstPlayer: Players
 }
+
+export type TMatrix = Array<Array<Cell>>

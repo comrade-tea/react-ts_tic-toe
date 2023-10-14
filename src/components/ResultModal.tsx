@@ -19,7 +19,7 @@ export const ResultModal: FC<IResultModal> = ({winnerName, visibility, onHideHan
 			</Modal.Header>
 
 			<Modal.Body>
-				<div>player "{winnerName && Players[winnerName]}" has won this game</div>
+				<div>player "<span className={"font-bold text-uppercase"}>{winnerName && Players[winnerName]}</span>" has won this game</div>
 				<div className={"text-center mt-5 font-bold"}>Play again?</div>
 			</Modal.Body>
 

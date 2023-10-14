@@ -1,17 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import {generateGrid, getDiagonals} from "./utils/utils";
+import {checkSameSequance, generateGrid, getDiagonals} from "./utils/utils";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {ResultModal} from "./components/ResultModal"
-import {Cell, IGameOptions, IHistoryRecord, Players} from "./models/Models";
+import {Cell, IGameOptions, IHistoryRecord, Players, TMatrix} from "./models/Models";
 import {HistoryList} from "./components/HistoryList";
 import CellGrid from "./components/CellGrid";
 import Todo from "./components/Todo";
 import GameSettings from "./components/GameSettings";
+import gameSettings from "./components/GameSettings";
 
 
 function App() {
 	const [gameOptions, setGameOptions] = useState<IGameOptions>({
-		gridSize: 3,
+		gridSize: 4,
 		minGridSize: 3,
 		maxGridSize: 6,
 		firstPlayer: Players.x
@@ -20,26 +21,24 @@ function App() {
 	const [winner, setWinner] = useState<Players | null>(null);
 	const [modelActive, setModelActive] = useState<boolean>(false);
 
-	const [grid, setGrid] = useState<Array<Array<Cell>>>(generateGrid(gameOptions.gridSize));
+	const [grid, setGrid] = useState<TMatrix>(generateGrid(gameOptions.gridSize));
 	const [currentPlayerTurn, setCurrentPlayerTurn] = useState<Players>(gameOptions.firstPlayer);
 
 	const [history, setHistory] = useState<Array<IHistoryRecord>>([]);
 	const [historyIndex, setHistoryIndex] = useState<number>(-1);
 
 	useEffect(() => {
-			if (history.length > 0) {
-				const flat = grid.flat(1);
+			const flat = grid.flat(1);
 
-				checkHorizontal(flat);
-				checkVertical(flat);
-				checkDiagonals(grid);
-			}
+			checkHorizontal(flat);
+			checkVertical(flat);
+			checkDiagonals(grid);
 
 			if (history.length === grid.flat(1).length) {
 				alert("draw")
 				resetGame()
 			}
-		}, [grid, history.length],
+		}, [grid],
 	);
 
 
@@ -54,34 +53,45 @@ function App() {
 		setModelActive(false);
 		resetGame();
 	}
-	const showWinnerHandler = () => setModelActive(true);
 
+	const showWinnerHandler = () => setModelActive(true);
 
 	function checkWinCondition(chunk: Cell[]): void {
 		const PlayersArray = Object.values(Players);
 
-		PlayersArray.forEach(player => {
-			if (chunk.every(cell => cell === Number(player))) {
-				setWinner(Number(player))
+		PlayersArray.forEach(playerId => {
+			if (checkSameSequance(chunk, +playerId)) {
+				setWinner(+playerId)
 				showWinnerHandler()
 			}
 		})
 	}
 
 	function checkHorizontal(arr: Cell[]): void {
-		const checkFrom = [0, 3, 6];
+		const checkFromIndex: number[] = []
 
-		checkFrom.forEach(index => {
-			const line = arr.slice(index, index + 3);
+		for (let i = 0; i < gameOptions.gridSize; i++) {
+			checkFromIndex.push(gameOptions.gridSize * i)
+		}
+		console.log("--horizontal indexes--", checkFromIndex)
+		
+		checkFromIndex.forEach(index => {
+			const line = arr.slice(index, index + gameOptions.gridSize);
 
 			checkWinCondition(line);
 		})
 	}
 
 	function checkVertical(arr: Cell[]): void {
-		const checkFrom = [0, 1, 2];
+		const checkFromIndex: number[] = []
 
-		checkFrom.forEach(checkIndex => {
+		for (let i = 0; i < gameOptions.gridSize; i++) {
+			checkFromIndex.push(i)
+		}
+
+		console.log("--vertical--", checkFromIndex )
+
+		checkFromIndex.forEach(checkIndex => {
 			const line = arr
 				.slice(checkIndex)
 				.filter((value, index) => index % 3 === 0)
@@ -90,9 +100,10 @@ function App() {
 		})
 	}
 
-	function checkDiagonals(arr: Array<Array<Cell>>): void {
+	function checkDiagonals(arr: TMatrix): void {
 		const diagonals = getDiagonals(arr);
-
+		// console.log("--diagonaaals--", diagonals)
+		
 		diagonals.forEach(line => checkWinCondition(line))
 	}
 
@@ -137,8 +148,10 @@ function App() {
 	return (
 		<>
 			<Todo items={[
+				"grid size fix win condition",
+				"button remove disabled on change",
 				"win animation ~_~",
-				"edit options",
+				"online mode? huh?"
 			]}/>
 
 			<GameSettings gameOptions={gameOptions} setGameOptions={setGameOptions} resetGame={resetGame}/>

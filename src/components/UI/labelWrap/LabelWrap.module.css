@@ -1,0 +1,6 @@
+.label {
+	display: block;
+	.text {
+		@apply block mb-2
+	}
+}
