@@ -1,3 +1,9 @@
+export type TMatrix = Array<Array<Cell>>
+
+export enum GameState {
+	inProgress, isEnded
+}
+
 export enum Cell {empty=0, x=1, o=2}
 
 export enum Players {
@@ -18,5 +24,3 @@ export interface IGameOptions {
 	maxGridSize: number
 	firstPlayer: Players
 }
-
-export type TMatrix = Array<Array<Cell>>

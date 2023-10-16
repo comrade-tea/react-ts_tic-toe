@@ -1,4 +1,4 @@
-import React, {Dispatch, FC, SetStateAction, useCallback} from "react";
+import React, {Dispatch, FC, SetStateAction, useCallback, useState} from "react";
 import {clamp} from "../utils/utils";
 import {IGameOptions, Players} from "../models/Models";
 import {Button} from "react-bootstrap";
@@ -13,16 +13,17 @@ interface IGameSettings {
 }
 
 const GameSettings: FC<IGameSettings> = ({gameOptions, setGameOptions, resetGame}) => {
-	const {gridSize, maxGridSize, minGridSize, firstPlayer} = gameOptions
+	const [localOptions, setLocalOptions] = useState<IGameOptions>({...gameOptions})
+	const {gridSize, maxGridSize, minGridSize, firstPlayer} = localOptions
 
 	const onPlayerChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
 		const value = +event.target.value;
-		setGameOptions(prev => ({...prev, firstPlayer: value}))
+		setLocalOptions(prev => ({...prev, firstPlayer: value}))
 	}, []);
 
 
 	const gridChangeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-		setGameOptions(prev => {
+		setLocalOptions(prev => {
 				let newValue: number;
 
 				if (e.target.valueAsNumber >= minGridSize && e.target.valueAsNumber <= maxGridSize) {
@@ -41,11 +42,12 @@ const GameSettings: FC<IGameSettings> = ({gameOptions, setGameOptions, resetGame
 		.keys(Players)
 		.filter(v => isNaN(+v))
 
+	let optionsAreEqual = gameOptions.gridSize === localOptions.gridSize && gameOptions.firstPlayer === localOptions.firstPlayer;
 	return (
 		<div className={"fixed left-0 top-0 bg-gray-200 px-4 py-3 rounded"}>
 			<h4 className={"mb-4"}>Game settings:</h4>
 			
-			<ul className={"list-unstyled flex flex-column gap-2"}>
+			<ul className={"list-unstyled flex flex-column gap-3"}>
 				<li>
 					<LabelWrap labelText={"Grid size (from 3 to 6):"}>
 						<input className={"input"}
@@ -57,7 +59,7 @@ const GameSettings: FC<IGameSettings> = ({gameOptions, setGameOptions, resetGame
 				</li>
 
 				<li>
-					<LabelWrap labelText={"First player"}>
+					<LabelWrap labelText={"First player:"}>
 						<select className={"input"}
 								  defaultValue={firstPlayer}
 								  onChange={onPlayerChange}
@@ -77,9 +79,14 @@ const GameSettings: FC<IGameSettings> = ({gameOptions, setGameOptions, resetGame
 					</LabelWrap>
 				</li>
 			</ul>
-
-			<Button className={"mt-4 w-100"} variant={"secondary"} type={"button"} onClick={resetGame}>
-				Apply changes
+			
+			<Button className={"mt-4 w-100"}
+					  variant={optionsAreEqual ? "secondary" : "success"}
+					  type={"button"}
+					  onClick={() => setGameOptions({...localOptions})}
+					  disabled={optionsAreEqual}
+			>
+				Submit changes
 			</Button>
 		</div>
 	)

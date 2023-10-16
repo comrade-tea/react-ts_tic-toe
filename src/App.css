@@ -16,6 +16,8 @@ code {
 }
 
 .App {
+	position: relative;
+	overflow: hidden;
 }
 
 input[type=number]::-webkit-inner-spin-button,

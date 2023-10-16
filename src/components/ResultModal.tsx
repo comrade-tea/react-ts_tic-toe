@@ -12,14 +12,27 @@ interface IResultModal {
 
 export const ResultModal: FC<IResultModal> = ({winnerName, visibility, onHideHandler}) => {
 	return (
-		// <Modal show={visibility} onHide={onHideHandler} animation={true} size={"sm"}>
 		<Modal show={visibility} animation={true} size={"sm"} >
 			<Modal.Header>
-				<Modal.Title>Congratulations</Modal.Title>
+				<Modal.Title>
+					{winnerName ? 
+						"Congratulations!" 
+						: 
+						"Draw ( ´･･)ﾉ(._.`)"
+					}
+				</Modal.Title>
 			</Modal.Header>
 
 			<Modal.Body>
-				<div>player "<span className={"font-bold text-uppercase"}>{winnerName && Players[winnerName]}</span>" has won this game</div>
+				<div>
+					{winnerName
+						? <div>player "<span className={"font-bold text-uppercase"}>{Players[winnerName]}</span>" has won this
+							game
+						</div>
+						: <div>No one won, everyone did great</div>
+					}
+				</div>
+				
 				<div className={"text-center mt-5 font-bold"}>Play again?</div>
 			</Modal.Body>
 

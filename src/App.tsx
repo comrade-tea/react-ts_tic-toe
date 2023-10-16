@@ -1,32 +1,33 @@
+import "bootstrap/dist/css/bootstrap.min.css";
 import React, {useEffect, useState} from 'react';
 import {checkSameSequance, generateGrid, getDiagonals} from "./utils/utils";
-import "bootstrap/dist/css/bootstrap.min.css";
 import {ResultModal} from "./components/ResultModal"
-import {Cell, IGameOptions, IHistoryRecord, Players, TMatrix} from "./models/Models";
+import {Cell, GameState, IGameOptions, IHistoryRecord, Players, TMatrix} from "./models/Models";
 import {HistoryList} from "./components/HistoryList";
 import CellGrid from "./components/CellGrid";
 import Todo from "./components/Todo";
 import GameSettings from "./components/GameSettings";
-import gameSettings from "./components/GameSettings";
 
 
 function App() {
 	const [gameOptions, setGameOptions] = useState<IGameOptions>({
-		gridSize: 4,
+		gridSize: 3,
 		minGridSize: 3,
 		maxGridSize: 6,
 		firstPlayer: Players.x
 	})
-
+	
+	const [gameState, setGameState] = useState<GameState>(GameState.inProgress)
+	
 	const [winner, setWinner] = useState<Players | null>(null);
-	const [modelActive, setModelActive] = useState<boolean>(false);
+	const [modelActive, setModalActive] = useState<boolean>(false);
 
 	const [grid, setGrid] = useState<TMatrix>(generateGrid(gameOptions.gridSize));
 	const [currentPlayerTurn, setCurrentPlayerTurn] = useState<Players>(gameOptions.firstPlayer);
 
 	const [history, setHistory] = useState<Array<IHistoryRecord>>([]);
 	const [historyIndex, setHistoryIndex] = useState<number>(-1);
-
+	
 	useEffect(() => {
 			const flat = grid.flat(1);
 
@@ -34,27 +35,35 @@ function App() {
 			checkVertical(flat);
 			checkDiagonals(grid);
 
-			if (history.length === grid.flat(1).length) {
-				alert("draw")
-				resetGame()
+			const cellsAreFilled = history.length === grid.flat(1).length;
+		
+			if (winner === null && cellsAreFilled) {
+				setModalActive(true);
+				setGameState(GameState.isEnded)
 			}
 		}, [grid],
 	);
 
+	useEffect(() => {
+		resetGame()
+	}, [gameOptions]);
+	
 
 	function resetGame() {
 		setGrid(generateGrid(gameOptions.gridSize))
 		setCurrentPlayerTurn(gameOptions.firstPlayer)
+		setGameState(GameState.inProgress)
+		setWinner(null)
 		setHistory([])
 		setHistoryIndex(-1)
 	}
 
 	const hideWinnerHandler = () => {
-		setModelActive(false);
+		setModalActive(false);
 		resetGame();
 	}
 
-	const showWinnerHandler = () => setModelActive(true);
+	const showWinnerHandler = () => setModalActive(true);
 
 	function checkWinCondition(chunk: Cell[]): void {
 		const PlayersArray = Object.values(Players);
@@ -63,6 +72,7 @@ function App() {
 			if (checkSameSequance(chunk, +playerId)) {
 				setWinner(+playerId)
 				showWinnerHandler()
+				setGameState(GameState.isEnded)
 			}
 		})
 	}
@@ -74,7 +84,7 @@ function App() {
 			checkFromIndex.push(gameOptions.gridSize * i)
 		}
 		//  console.log("--horizontal indexes ✔--", checkFromIndex)
-		
+
 		checkFromIndex.forEach(index => {
 			const line = arr.slice(index, index + gameOptions.gridSize);
 
@@ -88,8 +98,7 @@ function App() {
 		for (let i = 0; i < gameOptions.gridSize; i++) {
 			checkFromIndex.push(i)
 		}
-
-		console.log("--vertical--", checkFromIndex )
+		// console.log("--vertical--", checkFromIndex)
 
 		checkFromIndex.forEach(checkIndex => {
 			const line = arr
@@ -103,7 +112,7 @@ function App() {
 	function checkDiagonals(arr: TMatrix): void {
 		const diagonals = getDiagonals(arr);
 		// console.log("--diagonaaals--", diagonals)
-		
+
 		diagonals.forEach(line => checkWinCondition(line))
 	}
 
@@ -148,10 +157,8 @@ function App() {
 	return (
 		<>
 			<Todo items={[
-				"grid size fix win condition",
-				"button remove disabled on change",
 				"win animation ~_~",
-				"online mode? huh?"
+				"online mode? huh? websocket?"
 			]}/>
 
 			<GameSettings gameOptions={gameOptions} setGameOptions={setGameOptions} resetGame={resetGame}/>
@@ -163,12 +170,12 @@ function App() {
 							Player <b className={"font-bold text-uppercase"}>"{Players[currentPlayerTurn]}"</b> turn
 						</h3>
 
-						<CellGrid grid={grid} clickHandler={cellClickHandler}/>
+						<CellGrid grid={grid} clickHandler={cellClickHandler} gameState={gameState}/>
 					</div>
 
 					<div className={"rightbar"}>
 						<h3 className={"mb-4"}>History:</h3>
-
+						
 						<HistoryList historyList={history}
 										 clickHanlder={historyHandler}
 										 historyIndex={historyIndex}
