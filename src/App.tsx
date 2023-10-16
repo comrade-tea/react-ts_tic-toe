@@ -16,9 +16,9 @@ function App() {
 		maxGridSize: 6,
 		firstPlayer: Players.x
 	})
-	
+
 	const [gameState, setGameState] = useState<GameState>(GameState.inProgress)
-	
+
 	const [winner, setWinner] = useState<Players | null>(null);
 	const [modelActive, setModalActive] = useState<boolean>(false);
 
@@ -27,7 +27,7 @@ function App() {
 
 	const [history, setHistory] = useState<Array<IHistoryRecord>>([]);
 	const [historyIndex, setHistoryIndex] = useState<number>(-1);
-	
+
 	useEffect(() => {
 			const flat = grid.flat(1);
 
@@ -36,7 +36,7 @@ function App() {
 			checkDiagonals(grid);
 
 			const cellsAreFilled = history.length === grid.flat(1).length;
-		
+
 			if (winner === null && cellsAreFilled) {
 				setModalActive(true);
 				setGameState(GameState.isEnded)
@@ -47,7 +47,7 @@ function App() {
 	useEffect(() => {
 		resetGame()
 	}, [gameOptions]);
-	
+
 
 	function resetGame() {
 		setGrid(generateGrid(gameOptions.gridSize))
@@ -131,11 +131,9 @@ function App() {
 
 		return currentPlayerTurn === Players.x ? Players.o : Players.x;
 	}
-
-	const cellReady = (x: number, y: number) => grid[x][y] === Cell.empty;
-
+	
 	const cellClickHandler = (x: number, y: number): void => {
-		if (cellReady(x, y)) {
+		if (grid[x][y] === Cell.empty) {
 			const newGrid = updatedGrid(x, y, currentPlayerTurn);
 			const nextPlayer = getNextPlayer();
 			setGrid(newGrid)
@@ -157,7 +155,7 @@ function App() {
 	return (
 		<>
 			<Todo items={[
-				"win animation ~_~",
+				"win 'stay line' animation",
 				"online mode? huh? websocket?"
 			]}/>
 
@@ -175,7 +173,7 @@ function App() {
 
 					<div className={"rightbar"}>
 						<h3 className={"mb-4"}>History:</h3>
-						
+
 						<HistoryList historyList={history}
 										 clickHanlder={historyHandler}
 										 historyIndex={historyIndex}

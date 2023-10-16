@@ -25,7 +25,13 @@ const CellGrid: FC<ICellGrid> = ({grid, clickHandler, gameState}) => {
 						autoAlpha: 0,
 						physics2D: {velocity: "random(200, 650)", angle: "random(250, 340)", gravity: 500},
 						delay: "random(0, 0.2)",
-					})
+					}, 0)
+					.to("[data-grid-cell] span", {
+						duration: 1.4,
+						physics2D: {velocity: "random(100, 200)", angle: "random(-200, 320)", gravity: "random(200, 1200)", friction: 0.1},
+						scale: gsap.utils.random(0.6, 1.2, 0.2),
+						rotation: gsap.utils.random(-300, 300)
+					}, 0)
 			}
 
 		}, gridWrapRef)
@@ -36,7 +42,6 @@ const CellGrid: FC<ICellGrid> = ({grid, clickHandler, gameState}) => {
 
 	return (
 		<div ref={gridWrapRef} className="grid mt-4">
-			<button onClick={() => tl.current?.reverse()}>reverse dat shit</button>
 			{grid.map((row, xIndex) =>
 				<div className="flex" key={xIndex}>
 					{
@@ -58,7 +63,7 @@ const CellGrid: FC<ICellGrid> = ({grid, clickHandler, gameState}) => {
 									data-grid-cell=""
 								>
 
-									<span className={"m-auto"}>
+									<span className={"block m-auto"}>
 										{!cellIsEmpty && Players[value].toUpperCase()}
 									</span>
 								</div>
