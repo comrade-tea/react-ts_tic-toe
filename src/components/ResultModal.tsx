@@ -10,7 +10,7 @@ interface IResultModal {
 	onHideHandler(): boolean | void
 }
 
-export const ResultModal: FC<IResultModal> = ({winnerName, visibility, onHideHandler}) => {
+const ResultModal: FC<IResultModal> = ({winnerName, visibility, onHideHandler}) => {
 	return (
 		<Modal show={visibility} animation={true} size={"sm"} >
 			<Modal.Header>
@@ -25,11 +25,12 @@ export const ResultModal: FC<IResultModal> = ({winnerName, visibility, onHideHan
 
 			<Modal.Body>
 				<div>
-					{winnerName
-						? <div>player "<span className={"font-bold text-uppercase"}>{CellState[winnerName]}</span>" has won this
-							game
+					{winnerName ? 
+						<div>player "<span className={"font-bold text-uppercase"}>{CellState[winnerName]}</span>" 
+							has won this game
 						</div>
-						: <div>No one won, everyone did great</div>
+						:
+						<div>No one won, everyone did great</div>
 					}
 				</div>
 				
@@ -44,3 +45,5 @@ export const ResultModal: FC<IResultModal> = ({winnerName, visibility, onHideHan
 		</Modal>
 	)
 }
+
+export default ResultModal

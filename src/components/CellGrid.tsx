@@ -1,26 +1,24 @@
 import React, {FC, useLayoutEffect, useRef} from 'react'
-import {Cell, CellState, GameState, Players, TMatrix} from "../models/Models";
+import {Cell, CellState, GameProgress, TMatrix} from "../models/Models";
 import {gsap} from "gsap";
-// @ts-ignore
-// import {Physics2DPlugin} from "https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/Physics2DPlugin3.min.js"
-
 gsap.registerPlugin(Physics2DPlugin)
+
 // @ts-ignore
 gsap.config({trialWarn: false})
 
 interface ICellGrid {
 	grid: TMatrix
-	clickHandler: (x: number, y: number) => void
-	gameState: GameState
+	clickHandler: (cell: Cell) => void
+	gameProgress: GameProgress
 }
 
-const CellGrid: FC<ICellGrid> = ({grid, clickHandler, gameState}) => {
+const CellGrid: FC<ICellGrid> = ({grid, clickHandler, gameProgress}) => {
 	const gridWrapRef = useRef<HTMLDivElement>(null);
 	const tl = useRef<GSAPTimeline>()
-
+ 
 	useLayoutEffect(() => {
 		const ctx = gsap.context(() => {
-			if (gameState === GameState.isEnded) {
+			if (gameProgress === GameProgress.isEnded) {
 				tl.current = gsap.timeline()
 					.to("[data-grid-cell]", {
 						duration: 2.2,
@@ -39,7 +37,7 @@ const CellGrid: FC<ICellGrid> = ({grid, clickHandler, gameState}) => {
 		}, gridWrapRef)
 
 		return () => ctx.revert()
-	}, [gameState]);
+	}, [gameProgress]);
 
 
 	return (
@@ -61,7 +59,7 @@ const CellGrid: FC<ICellGrid> = ({grid, clickHandler, gameState}) => {
 								<div
 									className={cellStyles.join(" ")}
 									key={`${xIndex}${yIndex}`}
-									onClick={() => clickHandler(xIndex, yIndex)}
+									onClick={() => clickHandler(item)}
 									data-grid-cell=""
 								>
 

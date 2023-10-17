@@ -9,7 +9,7 @@ interface HistoryListProps {
 	clickHanlder(gridMask: Array<Array<Cell>>, player: number, index: number): void
 }
 
-export const HistoryList: FC<HistoryListProps> = ({historyList, historyIndex, clickHanlder}) => {
+const HistoryList: FC<HistoryListProps> = ({historyList, historyIndex, clickHanlder}) => {
 
 	if (!historyList.length)
 		return <span>no records</span>
@@ -39,3 +39,5 @@ export const HistoryList: FC<HistoryListProps> = ({historyList, historyIndex, cl
 		</ol>
 	)
 }
+
+export default HistoryList

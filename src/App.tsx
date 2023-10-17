@@ -1,23 +1,23 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, {useEffect, useState} from 'react';
 import {checkSameSequance, generateGrid, getDiagonals} from "./utils/utils";
-import {ResultModal} from "./components/ResultModal"
 import {
     Cell,
     CellState,
+    GameProgress,
     GameState,
     IGameOptions,
-    IHistoryRecord,
     playerO,
     Players,
     playerX,
     TMatrix
 } from "./models/Models";
-import {HistoryList} from "./components/HistoryList";
 
 import CellGrid from "./components/CellGrid";
-import TodoList from "./components/TodoList";
+import HistoryList from "./components/HistoryList";
+import ResultModal from "./components/ResultModal"
 import GameSettings from "./components/GameSettings";
+import TodoList from "./components/TodoList";
 
 
 function App() {
@@ -27,17 +27,18 @@ function App() {
         maxGridSize: 6,
         firstPlayer: playerX
     })
-    
-    const [gameState, setGameState] = useState<GameState>(GameState.inProgress)
 
-    const [winner, setWinner] = useState<Players | null>(null);
-    const [modalActive, setModalActive] = useState<boolean>(false);
-    
+    const [gameState, setGameState] = useState<GameState>({
+        currentPlayerTurn: gameOptions.firstPlayer,
+        progress: GameProgress.inProgress,
+        winner: null,
+        history: [],
+        historyIndex: -1,
+    })
+
     const [grid, setGrid] = useState<TMatrix>(generateGrid(gameOptions.gridSize));
-    const [currentPlayerTurn, setCurrentPlayerTurn] = useState<Players>(gameOptions.firstPlayer);
-
-    const [history, setHistory] = useState<Array<IHistoryRecord>>([]);
-    const [historyIndex, setHistoryIndex] = useState<number>(-1);
+    
+    const [modalActive, setModalActive] = useState<boolean>(false);
 
     useEffect(() => {
             const gridFlat = grid.flat(1);
@@ -46,40 +47,47 @@ function App() {
             checkVerticalLines(gridFlat);
             checkDiagonals(grid);
 
-            const cellsAreFilled = history.length === gridFlat.length;
-        
-            if (winner === null && cellsAreFilled) {
-                setGameState(GameState.isEnded)
+            const cellsAreFilled = gameState.history.length === gridFlat.length;
+
+            if (gameState.winner === null && cellsAreFilled) {
+                setGameState(prev => ({...prev, progress: GameProgress.isEnded}))
             }
         }, [grid],
     );
 
     useEffect(() => {
-        if (gameState === GameState.isEnded) {
+        if (gameState.progress === GameProgress.isEnded) {
             setModalActive(true)
         }
-        if (gameState === GameState.inProgress) {
+        if (gameState.progress === GameProgress.inProgress) {
             setModalActive(false)
             resetGame()
         }
-    }, [gameState, gameOptions]);
+    }, [gameState.progress, gameOptions]);
 
     function resetGame() {
-        setGameState(GameState.inProgress)
-        setWinner(null)
         setGrid(generateGrid(gameOptions.gridSize))
-        setCurrentPlayerTurn(gameOptions.firstPlayer)
-        setHistory([])
-        setHistoryIndex(-1)
+
+        setGameState(prev => ({
+            ...prev,
+            progress: GameProgress.inProgress,
+            winner: null,
+            currentPlayerTurn: gameOptions.firstPlayer,
+            history: [],
+            historyIndex: -1
+        }))
     }
 
     function checkLineWinCondition(chunk: Cell[]): void {
         const PlayersArray: Players[] = [playerX, playerO];
-        
+
         PlayersArray.forEach(playerId => {
             if (checkSameSequance(chunk, playerId)) {
-                setGameState(GameState.isEnded)
-                setWinner(playerId)
+                setGameState(prev => ({
+                    ...prev,
+                    progress: GameProgress.isEnded,
+                    winner: playerId
+                }))
             }
         })
     }
@@ -131,26 +139,35 @@ function App() {
         return newArray;
     };
 
-    const cellClickHandler = (x: number, y: number): void => {
+    const cellClickHandler = (cell: Cell): void => {
+        const {x, y} = cell.coords
+
         if (grid[x][y]?.state === CellState.empty) {
 
-            const gridAfterTurn = updatedGrid(x, y, currentPlayerTurn);
-            const nextPlayer = currentPlayerTurn === playerX ? playerO : playerX;
+            const gridAfterTurn = updatedGrid(x, y, gameState.currentPlayerTurn);
+            const nextPlayer = gameState.currentPlayerTurn === playerX ? playerO : playerX;
 
             setGrid(gridAfterTurn)
-            setCurrentPlayerTurn(nextPlayer)
 
-            setHistoryIndex(prev => prev + 1);
-            setHistory(prev => [...prev.slice(0, historyIndex + 1), {
-                x, y, gridMask: grid.map(item => [...item]), nextPlayer
-            }])
+            setGameState(prev => ({
+                ...prev,
+                currentPlayerTurn: nextPlayer,
+                historyIndex: prev.historyIndex + 1,
+                history: [...prev.history.slice(0, prev.historyIndex + 1), {
+                    x, y, gridMask: grid.map(item => [...item]), nextPlayer
+                }]
+            }))
         }
     }
 
-    const historyHandler = (gridMask: TMatrix, player: Players, index: number) => {
+    const historyHandler = (gridMask: TMatrix, currentPlayerTurn: Players, historyIndex: number) => {
         setGrid(gridMask);
-        setCurrentPlayerTurn(player);
-        setHistoryIndex(index);
+
+        setGameState(prev => ({
+            ...prev,
+            currentPlayerTurn,
+            historyIndex
+        }))
     };
 
     return (
@@ -159,34 +176,35 @@ function App() {
                 "win 'stay line' animation",
                 "online mode? huh? websocket?"
             ]}/>
-            
+
             <GameSettings gameOptions={gameOptions} setGameOptions={setGameOptions}/>
 
             <div className={"container-sm pt-[100px]"}>
                 <div className={"grid grid-cols-2"}>
                     <div className={"leftbar"}>
                         <h3>
-                            Player <b className={"font-bold text-uppercase"}>"{CellState[currentPlayerTurn]}"</b> turn
+                            Player <b
+                            className={"font-bold text-uppercase"}>"{CellState[gameState.currentPlayerTurn]}"</b> turn
                         </h3>
 
-                        <CellGrid grid={grid} clickHandler={cellClickHandler} gameState={gameState}/>
+                        <CellGrid grid={grid} clickHandler={cellClickHandler} gameProgress={gameState.progress}/>
                     </div>
 
                     <div className={"rightbar"}>
                         <h3 className={"mb-4"}>History:</h3>
 
-                        <HistoryList historyList={history}
+                        <HistoryList historyList={gameState.history}
+                                     historyIndex={gameState.historyIndex}
                                      clickHanlder={historyHandler}
-                                     historyIndex={historyIndex}
                         />
                     </div>
                 </div>
             </div>
 
             <ResultModal
-                winnerName={winner}
+                winnerName={gameState.winner}
                 visibility={modalActive}
-                onHideHandler={() => setGameState(GameState.inProgress)}
+                onHideHandler={() => setGameState(prev => ({...prev, progress: GameProgress.inProgress}))}
             />
         </>
     )
