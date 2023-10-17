@@ -3,33 +3,44 @@
 @tailwind utilities;
 
 body {
-	margin: 0;
-	font-family: -apple-system, 'Helvetica Neue', 'Segoe UI', 'Roboto', 'Oxygen',
-	'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    font-family: -apple-system, 'Helvetica Neue', 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-	monospace;
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
 }
 
 .App {
-	position: relative;
-	overflow: hidden;
+    position: relative;
+    overflow: hidden;
 }
 
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
-	opacity: 1;
+    opacity: 1;
 }
 
 .input {
-	@apply rounded;
-	display: block;
-	width: 100%;
-	min-height: 40px;
-	padding-left: 14px;
-	color: #000;
+    @apply rounded;
+    display: block;
+    width: 100%;
+    min-height: 40px;
+    padding-left: 14px;
+    color: #000;
+}
+
+.cell {
+    outline: 2px solid transparent;
+    outline-offset: 3rem;
+
+    &[data-grid-cell="pinned"] {
+        transition: all 0.5s ease-out !important;
+        outline-color: #8a0303;
+        outline-offset: -1px;
+    }
 }

@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, {useEffect, useState} from 'react';
-import {checkSameSequance, generateGrid, getDiagonals} from "./utils/utils";
+import {checkSameSequance, generateGrid, getDiagonals, updatedGrid} from "./utils/utils";
 import {
     Cell,
     CellState,
@@ -32,12 +32,13 @@ function App() {
         currentPlayerTurn: gameOptions.firstPlayer,
         progress: GameProgress.inProgress,
         winner: null,
+        winnerLine: null,
         history: [],
         historyIndex: -1,
     })
 
     const [grid, setGrid] = useState<TMatrix>(generateGrid(gameOptions.gridSize));
-    
+
     const [modalActive, setModalActive] = useState<boolean>(false);
 
     useEffect(() => {
@@ -74,19 +75,27 @@ function App() {
             winner: null,
             currentPlayerTurn: gameOptions.firstPlayer,
             history: [],
-            historyIndex: -1
+            historyIndex: -1,
+            winnerLine: null
         }))
     }
 
     function checkLineWinCondition(chunk: Cell[]): void {
         const PlayersArray: Players[] = [playerX, playerO];
-
+        
         PlayersArray.forEach(playerId => {
             if (checkSameSequance(chunk, playerId)) {
+                const gridAnimationPrepared = [...grid]
+                chunk.forEach(cell => {
+                    const {x, y} = cell.coords
+                    gridAnimationPrepared[x][y].isPinned = true 
+                })
+                
                 setGameState(prev => ({
                     ...prev,
                     progress: GameProgress.isEnded,
-                    winner: playerId
+                    winner: playerId,
+                    winnerLine: chunk
                 }))
             }
         })
@@ -132,23 +141,14 @@ function App() {
     }
 
 
-    const updatedGrid = (rowIndex: number, columnIndex: number, newValue: Players) => {
-        const newArray = [...grid]; // Create a copy of the array using the spread operator
-        newArray[rowIndex][columnIndex].state = newValue; // Update the nested array
-
-        return newArray;
-    };
-
     const cellClickHandler = (cell: Cell): void => {
         const {x, y} = cell.coords
 
         if (grid[x][y]?.state === CellState.empty) {
-
-            const gridAfterTurn = updatedGrid(x, y, gameState.currentPlayerTurn);
+            const gridAfterTurn = updatedGrid(grid, cell, gameState.currentPlayerTurn);
             const nextPlayer = gameState.currentPlayerTurn === playerX ? playerO : playerX;
 
             setGrid(gridAfterTurn)
-
             setGameState(prev => ({
                 ...prev,
                 currentPlayerTurn: nextPlayer,
@@ -187,7 +187,10 @@ function App() {
                             className={"font-bold text-uppercase"}>"{CellState[gameState.currentPlayerTurn]}"</b> turn
                         </h3>
 
-                        <CellGrid grid={grid} clickHandler={cellClickHandler} gameProgress={gameState.progress}/>
+                        <CellGrid grid={grid}
+                                  gameProgress={gameState.progress}
+                                  clickHandler={cellClickHandler}
+                        />
                     </div>
 
                     <div className={"rightbar"}>
@@ -204,7 +207,7 @@ function App() {
             <ResultModal
                 winnerName={gameState.winner}
                 visibility={modalActive}
-                onHideHandler={() => setGameState(prev => ({...prev, progress: GameProgress.inProgress}))}
+                onHideHandler={resetGame}
             />
         </>
     )

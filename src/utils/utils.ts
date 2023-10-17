@@ -1,4 +1,4 @@
-import {Cell, CellState, TMatrix} from "../models/Models";
+import {Cell, CellState, Players, TMatrix} from "../models/Models";
 
 export function getDiagonals(matrix: TMatrix): TMatrix {
     const numRows = matrix.length;
@@ -44,20 +44,29 @@ export function getDiagonals(matrix: TMatrix): TMatrix {
 
 export const generateGrid = (size: number): TMatrix => {
     const result = []
-    
+
     for (let x = 0; x < size; x++) {
         let row: Array<Cell> = []
-        
+
         for (let y = 0; y < size; y++) {
             row.push({
                 state: CellState.empty,
-                coords: {x, y}
+                coords: {x, y},
+                isPinned: false
             })
         }
         result.push(row)
     }
-    
+
     return result
+}
+
+export const updatedGrid = (grid: TMatrix, cell: Cell, player: Players) => {
+    const {x, y} = cell.coords
+    const gridUpdated = [...grid]
+    gridUpdated[x][y].state = player
+    
+    return gridUpdated;
 }
 
 export const clamp = (value: number, min: number, max: number) => {
@@ -67,7 +76,7 @@ export const clamp = (value: number, min: number, max: number) => {
 export const checkSameSequance = (flatGrid: Cell[], stateToCheck: CellState): boolean => {
     return flatGrid.some((cell, index, _this) => {
         // console.log(`sequance cell: ${cell?.state} stateToCheck: ${stateToCheck}`);
-        
+
         if (cell.state === stateToCheck) {
             const nextState = _this[index + 1]?.state
             const afterNextState = _this[index + 2]?.state

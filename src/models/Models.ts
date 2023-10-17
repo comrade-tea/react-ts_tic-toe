@@ -17,6 +17,7 @@ export enum CellState {empty, x, o}
 export type Cell = {
     state: CellState,
     coords: { x: number, y: number }
+    isPinned: boolean;
 }
 
 
