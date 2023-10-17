@@ -19,7 +19,7 @@ const CellGridItem: FC<ICellGridItem> = ({cell, clickHandler}) => {
     return (
         <div className={`cell ${cellStyles.join(" ")}`}
              onClick={() => clickHandler(cell)}
-             data-grid-cell={cell.isPinned ? "pinned" : "unpinned"}>
+             data-grid-cell={cell.isPinned && !cellIsEmpty ? "pinned" : "unpinned"}>
             
             <span className={"block m-auto text-uppercase"}>
                 {!cellIsEmpty && CellState[cell.state]}

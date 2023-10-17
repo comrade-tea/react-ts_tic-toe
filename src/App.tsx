@@ -173,7 +173,6 @@ function App() {
     return (
         <>
             <TodoList items={[
-                "win 'stay line' animation",
                 "online mode? huh? websocket?"
             ]}/>
 
