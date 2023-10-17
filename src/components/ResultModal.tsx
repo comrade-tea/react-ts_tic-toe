@@ -1,7 +1,7 @@
 import React, {FC} from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import {Players} from "../models/Models";
+import {CellState, Players} from "../models/Models";
 
 interface IResultModal {
 	winnerName: Players | null
@@ -26,7 +26,7 @@ export const ResultModal: FC<IResultModal> = ({winnerName, visibility, onHideHan
 			<Modal.Body>
 				<div>
 					{winnerName
-						? <div>player "<span className={"font-bold text-uppercase"}>{Players[winnerName]}</span>" has won this
+						? <div>player "<span className={"font-bold text-uppercase"}>{CellState[winnerName]}</span>" has won this
 							game
 						</div>
 						: <div>No one won, everyone did great</div>

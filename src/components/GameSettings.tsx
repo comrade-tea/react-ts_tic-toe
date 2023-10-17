@@ -1,6 +1,6 @@
 import React, {Dispatch, FC, SetStateAction, useCallback, useState} from "react";
 import {clamp} from "../utils/utils";
-import {IGameOptions, Players} from "../models/Models";
+import {CellState, IGameOptions, playerO, playerX} from "../models/Models";
 import {Button} from "react-bootstrap";
 import LabelWrap from "./UI/labelWrap/LabelWrap";
 
@@ -9,10 +9,9 @@ type Dispatcher<S> = Dispatch<SetStateAction<S>>;
 interface IGameSettings {
 	gameOptions: IGameOptions
 	setGameOptions: Dispatcher<IGameOptions>
-	resetGame: () => void
 }
 
-const GameSettings: FC<IGameSettings> = ({gameOptions, setGameOptions, resetGame}) => {
+const GameSettings: FC<IGameSettings> = ({gameOptions, setGameOptions}) => {
 	const [localOptions, setLocalOptions] = useState<IGameOptions>({...gameOptions})
 	const {gridSize, maxGridSize, minGridSize, firstPlayer} = localOptions
 
@@ -21,7 +20,7 @@ const GameSettings: FC<IGameSettings> = ({gameOptions, setGameOptions, resetGame
 		setLocalOptions(prev => ({...prev, firstPlayer: value}))
 	}, []);
 
-
+	
 	const gridChangeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		setLocalOptions(prev => {
 				let newValue: number;
@@ -38,11 +37,10 @@ const GameSettings: FC<IGameSettings> = ({gameOptions, setGameOptions, resetGame
 		)
 	}, []);
 
-	const PlayersList: string[] = Object
-		.keys(Players)
-		.filter(v => isNaN(+v))
+	const PlayersList: string[] = [CellState[playerX], CellState[playerO]]
 
-	let optionsAreEqual = gameOptions.gridSize === localOptions.gridSize && gameOptions.firstPlayer === localOptions.firstPlayer;
+	const optionsAreEqual = gameOptions.gridSize === localOptions.gridSize && gameOptions.firstPlayer === localOptions.firstPlayer;
+	
 	return (
 		<div className={"fixed left-0 top-0 bg-gray-200 px-4 py-3 rounded"}>
 			<h4 className={"mb-4"}>Game settings:</h4>
@@ -66,7 +64,7 @@ const GameSettings: FC<IGameSettings> = ({gameOptions, setGameOptions, resetGame
 						>
 							{
 								PlayersList.map(key => {
-									const value = Players[(key as keyof typeof Players)]
+									const value = CellState[(key as keyof typeof CellState)]
 
 									return (
 										<option key={key} value={value}>

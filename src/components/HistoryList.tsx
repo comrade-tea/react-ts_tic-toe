@@ -1,4 +1,4 @@
-import {Cell, IHistoryRecord, Players} from "../models/Models";
+import {Cell, CellState, IHistoryRecord, Players} from "../models/Models";
 import {Button} from "react-bootstrap";
 import {FC} from "react";
 
@@ -28,7 +28,7 @@ export const HistoryList: FC<HistoryListProps> = ({historyList, historyIndex, cl
 								className={btnClasses}
 								onClick={() => clickHanlder(gridMask, nextPlayer, index)}>
 
-								Turn of player "{Players[nextPlayer]}"; coords: x={x}, y={y}
+								Turn of player "{CellState[nextPlayer]}"; coords: x={x}, y={y}
 							</Button>
 
 							{currentItem && <span className={"text-3xl ms-2"}>←</span>}

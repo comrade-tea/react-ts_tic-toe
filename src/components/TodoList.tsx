@@ -4,7 +4,7 @@ interface ITodo {
 	items: string[];
 }
 
-const Todo: FC<ITodo> = ({items}) => {
+const TodoList: FC<ITodo> = ({items}) => {
 	return (
 		<div className={"fixed right-0 bg-blue-300 p-2"}>
 			<div>todo:</div>
@@ -15,4 +15,4 @@ const Todo: FC<ITodo> = ({items}) => {
 		</div>
 	)
 }
-export default Todo
+export default TodoList

@@ -1,10 +1,12 @@
 import React, {FC, useLayoutEffect, useRef} from 'react'
-import {Cell, GameState, Players, TMatrix} from "../models/Models";
+import {Cell, CellState, GameState, Players, TMatrix} from "../models/Models";
 import {gsap} from "gsap";
 // @ts-ignore
 // import {Physics2DPlugin} from "https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/Physics2DPlugin3.min.js"
 
 gsap.registerPlugin(Physics2DPlugin)
+// @ts-ignore
+gsap.config({trialWarn: false})
 
 interface ICellGrid {
 	grid: TMatrix
@@ -45,10 +47,10 @@ const CellGrid: FC<ICellGrid> = ({grid, clickHandler, gameState}) => {
 			{grid.map((row, xIndex) =>
 				<div className="flex" key={xIndex}>
 					{
-						row.map((value, yIndex) => {
+						row.map((item, yIndex) => {
 							const cellStyles = ["w-[100px]", "h-[100px]", "border", "text-4xl", "font-bold", "transition-colors", "flex"]
-							const cellIsEmpty = value === Cell.empty;
-
+							const cellIsEmpty = item?.state === CellState.empty; // ...
+							
 							if (cellIsEmpty) {
 								cellStyles.push("hover:bg-gray-100 cursor-pointer")
 							} else {
@@ -64,7 +66,7 @@ const CellGrid: FC<ICellGrid> = ({grid, clickHandler, gameState}) => {
 								>
 
 									<span className={"block m-auto"}>
-										{!cellIsEmpty && Players[value].toUpperCase()}
+										{!cellIsEmpty && CellState[item.state]?.toUpperCase()}
 									</span>
 								</div>
 							);
