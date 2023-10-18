@@ -188,8 +188,7 @@ function App() {
 				<div className={"content"}>
 					<div className={"main"}>
 						<h3>
-							Player <b className={"font-bold text-uppercase"}>"{CellState[gameState.currentPlayerTurn]}"</b>
-							turn
+							Player <b className={"font-bold text-uppercase"}>"{CellState[gameState.currentPlayerTurn]}"</b> turn
 						</h3>
 
 						<CellGrid grid={grid}

@@ -42,7 +42,7 @@ const GameSettings: FC<IGameSettings> = ({gameOptions, setGameOptions}) => {
 	const optionsAreEqual = gameOptions.gridSize === localOptions.gridSize && gameOptions.firstPlayer === localOptions.firstPlayer;
 	
 	return (
-		<div className={"md:fixed right-0 top-0 bg-gray-200 px-4 py-4 rounded mb-20"}>
+		<div className={"md:absolute right-0 top-0 bg-gray-200 px-4 py-4 rounded mb-20"}>
 			<h4 className={"mb-4"}>Game settings:</h4>
 			
 			<ul className={"list-unstyled flex flex-column gap-3"}>

@@ -2,7 +2,7 @@ import React from 'react'
 
 const Intro = () => {
 	return (
-		<div className={"intro mb-20 max-w-[500px]"}>
+		<div className={"intro mb-14 max-w-[500px]"}>
 			<h1 className={"mb-8"}>Advanced tic-toe</h1>
 
 			<h4>Features:</h4>
