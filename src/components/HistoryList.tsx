@@ -1,4 +1,4 @@
-import {Cell, CellState, IHistoryRecord, Players} from "../models/Models";
+import {CellState, IHistoryRecord, TMatrix} from "../models/Models";
 import {Button} from "react-bootstrap";
 import {FC} from "react";
 
@@ -6,26 +6,26 @@ interface HistoryListProps {
 	historyList: IHistoryRecord[],
 	historyIndex: number,
 
-	clickHanlder(gridMask: Array<Array<Cell>>, player: number, index: number): void
+	clickHanlder(gridMask: TMatrix, player: number, index: number): void
 }
 
 const HistoryList: FC<HistoryListProps> = ({historyList, historyIndex, clickHanlder}) => {
 
 	if (!historyList.length)
-		return <span>no records</span>
+		return <i>no records</i>
 
 
 	return (
 		<ol className={"ps-0"}>
-			{historyList.map(({x, y, gridMask, nextPlayer}, index) => {
+			{historyList.map((item, index) => {
+					const {x, y, gridMask, nextPlayer} = item
 					const currentItem = historyIndex === index;
 
-					const btnClasses = `btn select-none ${currentItem ? "btn-dark" : "btn-light"}`;
-					
 					return (
 						<li key={index} className={"flex align-items-center mt-3 list-decimal list-inside"}>
 							<Button
-								className={btnClasses}
+								className={"select-none"}
+								variant={currentItem ? "dark" : "light"}
 								onClick={() => clickHanlder(gridMask, nextPlayer, index)}>
 
 								Turn of player "{CellState[nextPlayer]}"; coords: x={x}, y={y}
