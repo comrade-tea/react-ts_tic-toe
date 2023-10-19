@@ -1,4 +1,4 @@
-import {CellState, IHistoryRecord, TMatrix} from "../models/Models";
+import {CellState, IHistoryRecord, playerO, playerX, TMatrix} from "../models/Models";
 import {Button} from "react-bootstrap";
 import {FC} from "react";
 
@@ -16,20 +16,21 @@ const HistoryList: FC<HistoryListProps> = ({historyList, historyIndex, clickHand
 
 	return (
 		<ol className={"ps-0"}>
-			{historyList.map((item, index) => {
-					const {x, y, gridMask, nextPlayer} = item
+			{historyList.map((turn, index) => {
+					const {x, y, gridMask, playerMadeTurn} = turn
 					const currentItem = historyIndex === index
-
-					console.log("----", gridMask)
+				
+					const nextPlayerTurn = playerMadeTurn === playerX ? playerO : playerX
+					// console.log("----", gridMask)
 
 					return (
 						<li key={index} className={"flex align-items-center mt-3 list-decimal list-inside"}>
 							<Button
 								variant={currentItem ? "dark" : "light"}
-								onClick={() => clickHandler(gridMask, nextPlayer, index)}>
+								onClick={() => clickHandler(gridMask, nextPlayerTurn, index)}>
 
 								<span className={"select-none text-sm sm:text-base text-nowrap"}>
-									Turn of player "{CellState[nextPlayer]}"; coords: x={x}, y={y}
+									Turn of player "{CellState[playerMadeTurn]}"; coords: x={x}, y={y}
 								</span>
 							</Button>
 

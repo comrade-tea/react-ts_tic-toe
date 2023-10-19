@@ -30,7 +30,7 @@ export const playerO: CellState = CellState.o
 export interface IHistoryRecord {
     x: number,
     y: number,
-    nextPlayer: CellState
+    playerMadeTurn: Players
     gridMask: TMatrix
 }
 
@@ -38,5 +38,5 @@ export interface IGameOptions {
     gridSize: number
     minGridSize: number
     maxGridSize: number
-    firstPlayer: CellState
+    firstPlayer: Players
 }

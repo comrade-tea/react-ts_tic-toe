@@ -91,3 +91,7 @@ export const checkSameSequance = (flatGrid: Cell[], stateToCheck: CellState): bo
         }
     });
 }
+
+export function deepCloneArray(array: any[]): [] {
+  return JSON.parse(JSON.stringify(array));
+}
