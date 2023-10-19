@@ -24,7 +24,7 @@ const CellGrid: FC<ICellGrid> = ({grid, clickHandler, gameProgress}) => {
     useEffect(() => {
         const getDimensions = (): number => gridWrapRef?.current?.offsetWidth || 0
         const handleResize = () => {
-            console.log("----", "resize?");
+            // console.log("----", "resize?");
             setGridWidth(getDimensions())
         }
 
@@ -69,7 +69,7 @@ const CellGrid: FC<ICellGrid> = ({grid, clickHandler, gameProgress}) => {
 
 
     return (
-        <div ref={gridWrapRef} className="grid mt-4 overflow-hidden w-100">
+        <div ref={gridWrapRef} className="grid mt-4 w-100">
             {grid.map((row, index) =>
                 <div className="flex" key={index}>
                     {

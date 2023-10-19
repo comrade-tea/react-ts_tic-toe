@@ -17,7 +17,6 @@ import CellGrid from "./components/CellGrid";
 import HistoryList from "./components/HistoryList";
 import ResultModal from "./components/ResultModal"
 import GameSettings from "./components/GameSettings";
-import TodoList from "./components/TodoList";
 import Intro from "./components/Intro";
 
 
@@ -30,10 +29,10 @@ function App() {
 	})
 
 	const [gameState, setGameState] = useState<GameState>({
-		currentPlayerTurn: gameOptions.firstPlayer,
 		progress: GameProgress.inProgress,
 		winner: null,
 		winnerLine: null,
+		currentPlayerTurn: gameOptions.firstPlayer,
 		history: [],
 		historyIndex: -1,
 	})
@@ -58,12 +57,16 @@ function App() {
 	);
 
 	useEffect(() => {
-		if (gameState.progress === GameProgress.isEnded) {
-			setModalActive(true)
-		}
-		if (gameState.progress === GameProgress.inProgress) {
-			setModalActive(false)
-			resetGame()
+		
+		switch (gameState.progress) {
+			case GameProgress.isEnded:
+				setModalActive(true)
+				break;
+				
+			case GameProgress.inProgress:
+				setModalActive(false)
+				resetGame()
+				break;
 		}
 	}, [gameState.progress, gameOptions]);
 
@@ -151,7 +154,7 @@ function App() {
 			const gridAfterTurn = updatedGrid(grid, cell, gameState.currentPlayerTurn);
 			const nextPlayer = gameState.currentPlayerTurn === playerX ? playerO : playerX;
 
-			setGrid(gridAfterTurn)
+
 			setGameState(prev => ({
 				...prev,
 				currentPlayerTurn: nextPlayer,
@@ -160,11 +163,13 @@ function App() {
 					x, y, gridMask: grid.map(item => [...item]), nextPlayer
 				}]
 			}))
+
+			setGrid(gridAfterTurn)
 		}
 	}
 
-	const historyHandler = (gridMask: TMatrix, currentPlayerTurn: Players, historyIndex: number) => {
-		setGrid(gridMask);
+	const historyHandler = (gridHistoryMask: TMatrix, currentPlayerTurn: Players, historyIndex: number) => {
+		setGrid(gridHistoryMask);
 
 		setGameState(prev => ({
 			...prev,
@@ -188,7 +193,8 @@ function App() {
 				<div className={"content"}>
 					<div className={"main"}>
 						<h3>
-							Player <b className={"font-bold text-uppercase"}>"{CellState[gameState.currentPlayerTurn]}"</b> turn
+							Player <b
+							className={"font-bold text-uppercase"}>"{CellState[gameState.currentPlayerTurn]}"</b> turn
 						</h3>
 
 						<CellGrid grid={grid}
@@ -202,7 +208,7 @@ function App() {
 
 						<HistoryList historyList={gameState.history}
 										 historyIndex={gameState.historyIndex}
-										 clickHanlder={historyHandler}
+										 clickHandler={historyHandler}
 						/>
 					</div>
 				</div>
