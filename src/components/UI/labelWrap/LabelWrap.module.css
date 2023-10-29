@@ -1,6 +1,6 @@
 .label {
-	display: block;
-	.text {
-		@apply block mb-1 font-semibold
-	}
+  display: block;
+  .text {
+    @apply block mb-1 font-semibold;
+  }
 }

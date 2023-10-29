@@ -1,245 +1,249 @@
-import "bootstrap/dist/css/bootstrap.min.css";
-import React, {useEffect, useState} from 'react';
-import {checkSameSequance, deepCloneArray, generateGrid, getDiagonals, updatedGrid} from "./utils/utils";
+import 'bootstrap/dist/css/bootstrap.min.css'
+
+import React, { useCallback, useEffect, useState } from 'react'
+
+import { CellGrid } from './components/CellGrid'
+import { Footer } from './components/Footer'
+import { GameSettings } from './components/GameSettings'
+import { HistoryList } from './components/HistoryList'
+import { Intro } from './components/Intro'
+import { ResultModal } from './components/ResultModal'
+import type { Cell, GameState, IGameOptions, Players, TMatrix } from './models/Models'
+import { CellState, GameProgress, playerO, playerX } from './models/Models'
 import {
-    Cell,
-    CellState,
-    GameProgress,
-    GameState,
-    IGameOptions,
-    playerO,
-    Players,
-    playerX,
-    TMatrix
-} from "./models/Models";
+  checkSameSequence,
+  deepCloneArray,
+  generateGrid,
+  getDiagonals,
+  updatedGrid,
+} from './utils/utils'
 
-import CellGrid from "./components/CellGrid";
-import HistoryList from "./components/HistoryList";
-import ResultModal from "./components/ResultModal"
-import GameSettings from "./components/GameSettings";
-import Intro from "./components/Intro";
-import TodoList from "./components/TodoList";
+export const App = () => {
+  const [gameOptions, setGameOptions] = useState<IGameOptions>({
+    gridSize: 3,
+    minGridSize: 3,
+    maxGridSize: 6,
+    firstPlayer: playerX,
+  })
 
+  const [gameState, setGameState] = useState<GameState>({
+    progress: GameProgress.inProgress,
+    winner: null,
+    winnerLine: null,
+    currentPlayerTurn: gameOptions.firstPlayer,
+    history: [],
+    historyIndex: -1,
+  })
 
-function App() {
-    const [gameOptions, setGameOptions] = useState<IGameOptions>({
-        gridSize: 3,
-        minGridSize: 3,
-        maxGridSize: 6,
-        firstPlayer: playerX
-    })
+  const [grid, setGrid] = useState<TMatrix>(generateGrid(gameOptions.gridSize))
 
-    const [gameState, setGameState] = useState<GameState>({
-        progress: GameProgress.inProgress,
-        winner: null,
-        winnerLine: null,
-        currentPlayerTurn: gameOptions.firstPlayer,
-        history: [],
-        historyIndex: -1,
-    })
+  const [modalActive, setModalActive] = useState<boolean>(false)
 
-    const [grid, setGrid] = useState<TMatrix>(generateGrid(gameOptions.gridSize));
+  const resetGame = useCallback(() => {
+    setGrid(generateGrid(gameOptions.gridSize))
 
-    const [modalActive, setModalActive] = useState<boolean>(false);
+    setGameState(prev => ({
+      ...prev,
+      progress: GameProgress.inProgress,
+      winner: null,
+      currentPlayerTurn: gameOptions.firstPlayer,
+      history: [],
+      historyIndex: -1,
+      winnerLine: null,
+    }))
+  }, [gameOptions.firstPlayer, gameOptions.gridSize])
 
-    // // temp
-    // useEffect(() => {
-    //     console.log("history", gameState.history[0]?.gridMask.flat().map(item => item.state))
-    //     console.log("curgrid", grid.flat().map(item => item.state))
-    // }, [gameState.history, gameState.historyIndex]);
-    // // temp
+  const checkLineWinCondition = useCallback(
+    (chunk: Cell[]): void => {
+      const PlayersArray: Players[] = [playerX, playerO]
 
-    useEffect(() => {
-            const gridFlat = grid.flat(1);
+      PlayersArray.forEach(playerId => {
+        if (checkSameSequence(chunk, playerId)) {
+          const gridAnimationPrepared = Array.from(grid)
+          chunk
+            .filter(cell => cell.state === playerId)
+            .forEach(cell => {
+              const { x, y } = cell.coords
+              gridAnimationPrepared[x][y].isPinned = true
+            })
 
-            checkHorizontalLines(gridFlat);
-            checkVerticalLines(gridFlat);
-            checkDiagonals(grid);
-
-            const cellsAreFilled = gameState.history.length === gridFlat.length;
-
-            if (gameState.winner === null && cellsAreFilled) {
-                setGameState(prev => ({...prev, progress: GameProgress.isEnded}))
-            }
-        }, [grid],
-    );
-
-    useEffect(() => {
-
-        switch (gameState.progress) {
-            case GameProgress.isEnded:
-                setModalActive(true)
-                break;
-
-            case GameProgress.inProgress:
-                setModalActive(false)
-                resetGame()
-                break;
+          setGameState(prev => ({
+            ...prev,
+            progress: GameProgress.isEnded,
+            winner: playerId,
+            winnerLine: chunk,
+          }))
         }
-    }, [gameState.progress, gameOptions]);
+      })
+    },
+    [grid]
+  )
 
-    function resetGame() {
-        setGrid(generateGrid(gameOptions.gridSize))
+  const checkHorizontalLines = useCallback(
+    (gridFlat: Cell[]): void => {
+      const checkFromIndex: number[] = []
+
+      for (let i = 0; i < gameOptions.gridSize; i++) {
+        checkFromIndex.push(gameOptions.gridSize * i)
+      }
+
+      checkFromIndex.forEach(index => {
+        const line = gridFlat.slice(index, index + gameOptions.gridSize)
+
+        checkLineWinCondition(line)
+      })
+    },
+    [checkLineWinCondition, gameOptions.gridSize]
+  )
+
+  const checkVerticalLines = useCallback(
+    (arr: Cell[]): void => {
+      const checkFromIndex: number[] = []
+
+      for (let i = 0; i < gameOptions.gridSize; i++) {
+        checkFromIndex.push(i)
+      }
+
+      checkFromIndex.forEach(checkIndex => {
+        const line = arr
+          .slice(checkIndex)
+          .filter((value, index) => index % gameOptions.gridSize === 0)
+
+        checkLineWinCondition(line)
+      })
+    },
+    [checkLineWinCondition, gameOptions.gridSize]
+  )
+
+  const checkDiagonals = useCallback(
+    (arr: TMatrix): void => {
+      const diagonals: TMatrix = getDiagonals(arr)
+
+      diagonals.forEach(line => {
+        checkLineWinCondition(line)
+      })
+    },
+    [checkLineWinCondition]
+  )
+
+  const cellClickHandler = useCallback(
+    (cell: Cell): void => {
+      const { x, y } = cell.coords
+
+      if (grid[x][y]?.state === CellState.empty) {
+        const gridAfterTurn = updatedGrid(grid, cell, gameState.currentPlayerTurn)
+        const nextPlayer = gameState.currentPlayerTurn === playerX ? playerO : playerX
 
         setGameState(prev => ({
-            ...prev,
-            progress: GameProgress.inProgress,
-            winner: null,
-            currentPlayerTurn: gameOptions.firstPlayer,
-            history: [],
-            historyIndex: -1,
-            winnerLine: null
+          ...prev,
+          currentPlayerTurn: nextPlayer,
+          historyIndex: prev.historyIndex + 1,
+          history: [
+            ...prev.history.slice(0, prev.historyIndex + 1),
+            { x, y, gridMask: deepCloneArray(grid), playerMadeTurn: gameState.currentPlayerTurn },
+          ],
         }))
+
+        setGrid(gridAfterTurn)
+      }
+    },
+    [gameState.currentPlayerTurn, grid]
+  )
+
+  const historyHandler = useCallback(
+    (gridHistoryMask: TMatrix, currentPlayerTurn: Players, historyIndex: number) => {
+      setGrid(deepCloneArray<TMatrix>(gridHistoryMask))
+
+      setGameState(prev => ({
+        ...prev,
+        currentPlayerTurn,
+        historyIndex,
+      }))
+    },
+    []
+  )
+
+  useEffect(() => {
+    const gridFlat = grid.flat(1)
+
+    checkHorizontalLines(gridFlat)
+    checkVerticalLines(gridFlat)
+    checkDiagonals(grid)
+
+    const cellsAreFilled = gameState.history.length === gridFlat.length
+
+    if (gameState.winner === null && cellsAreFilled) {
+      setGameState(prev => ({ ...prev, progress: GameProgress.isEnded }))
     }
+  }, [
+    checkDiagonals,
+    checkHorizontalLines,
+    checkVerticalLines,
+    gameState.history.length,
+    gameState.winner,
+    grid,
+  ])
 
-    function checkLineWinCondition(chunk: Cell[]): void {
-        const PlayersArray: Players[] = [playerX, playerO];
+  useEffect(() => {
+    switch (gameState.progress) {
+      case GameProgress.isEnded: {
+        setModalActive(true)
+        break
+      }
 
-        PlayersArray.forEach(playerId => {
-            if (checkSameSequance(chunk, playerId)) {
-                const gridAnimationPrepared = [...grid]
-                chunk
-                    .filter(cell => cell.state === playerId)
-                    .forEach(cell => {
-                        const {x, y} = cell.coords
-                        gridAnimationPrepared[x][y].isPinned = true
-                    })
-
-                setGameState(prev => ({
-                    ...prev,
-                    progress: GameProgress.isEnded,
-                    winner: playerId,
-                    winnerLine: chunk
-                }))
-            }
-        })
+      case GameProgress.inProgress: {
+        setModalActive(false)
+        resetGame()
+        break
+      }
     }
+  }, [gameState.progress, gameOptions, resetGame])
 
-    function checkHorizontalLines(gridFlat: Cell[]): void {
-        const checkFromIndex: number[] = []
+  return (
+    <div className="min-h-screen flex flex-column">
+      {/* <TodoList items={["online mode websocket?"]}/>*/}
 
-        for (let i = 0; i < gameOptions.gridSize; i++) {
-            checkFromIndex.push(gameOptions.gridSize * i)
-        }
-        //  console.log("--horizontal indexes ✔--", checkFromIndex)
+      <div className="md:container container-sm mx-auto py-[10vh] px-4">
+        <Intro />
 
-        checkFromIndex.forEach(index => {
-            const line = gridFlat.slice(index, index + gameOptions.gridSize);
+        <GameSettings gameOptions={gameOptions} setGameOptions={setGameOptions} />
 
-            checkLineWinCondition(line);
-        })
-    }
+        <div className="content">
+          <div className="main">
+            <h3>
+              Player{' '}
+              <b className="font-bold text-uppercase">
+                &quot;{CellState[gameState.currentPlayerTurn]}&ldquo;
+              </b>
+              turn
+            </h3>
 
-    function checkVerticalLines(arr: Cell[]): void {
-        const checkFromIndex: number[] = []
-
-        for (let i = 0; i < gameOptions.gridSize; i++) {
-            checkFromIndex.push(i)
-        }
-        // console.log("--vertical--", checkFromIndex)
-
-        checkFromIndex.forEach(checkIndex => {
-            const line = arr
-                .slice(checkIndex)
-                .filter((value, index) => index % gameOptions.gridSize === 0)
-
-            checkLineWinCondition(line)
-        })
-    }
-
-    function checkDiagonals(arr: TMatrix): void {
-        const diagonals = getDiagonals(arr);
-        // console.log("--diagonaaals--", diagonals)
-
-        diagonals.forEach(line => checkLineWinCondition(line))
-    }
-
-
-    const cellClickHandler = (cell: Cell): void => {
-        const {x, y} = cell.coords
-
-        if (grid[x][y]?.state === CellState.empty) {
-            const gridAfterTurn = updatedGrid(grid, cell, gameState.currentPlayerTurn);
-            const nextPlayer = gameState.currentPlayerTurn === playerX ? playerO : playerX;
-			
-            setGameState(prev => ({
-                ...prev,
-                currentPlayerTurn: nextPlayer,
-                historyIndex: prev.historyIndex + 1,
-                history: [...prev.history.slice(0, prev.historyIndex + 1), {
-                    x, y,
-					gridMask: deepCloneArray(grid),
-					playerMadeTurn: gameState.currentPlayerTurn
-                }]
-            }))
-
-            setGrid(gridAfterTurn)
-        }
-    }
-
-    const historyHandler = (gridHistoryMask: TMatrix, currentPlayerTurn: Players, historyIndex: number) => {
-        setGrid(deepCloneArray(gridHistoryMask));
-
-        setGameState(prev => ({
-            ...prev,
-            currentPlayerTurn: currentPlayerTurn,
-            historyIndex: historyIndex
-        }))
-    };
-
-    return (
-        <div className={"min-h-screen flex flex-column"}>
-            {/*<TodoList items={["online mode websocket?"]}/>*/}
-			
-            <div className={"md:container container-sm mx-auto py-[10vh] px-4"}>
-                <Intro/>
-
-                <GameSettings gameOptions={gameOptions} setGameOptions={setGameOptions}/>
-
-                <div className={"content"}>
-                    <div className={"main"}>
-                        <h3>
-                            Player <b
-                            className={"font-bold text-uppercase"}>"{CellState[gameState.currentPlayerTurn]}"</b> turn
-                        </h3>
-
-                        <CellGrid grid={grid}
-                                  gameProgress={gameState.progress}
-                                  clickHandler={cellClickHandler}
-                        />
-                    </div>
-
-                    <div className={"rightbar"}>
-                        <h3 className={"mb-4"}>History:</h3>
-
-                        <HistoryList historyList={gameState.history}
-                                     historyIndex={gameState.historyIndex}
-                                     clickHandler={historyHandler}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <ResultModal
-                winnerName={gameState.winner}
-                visibility={modalActive}
-                onHideHandler={resetGame}
+            <CellGrid
+              grid={grid}
+              gameProgress={gameState.progress}
+              clickHandler={cellClickHandler}
             />
-			
-			<footer className="bg-gray-800 text-white py-3 mt-auto">
-				<div className={"container px-4 mx-auto"}>
-                    <ul className={"flex mb-0 gap-x-5"}>
-                        <li>
-                            <a href={"https://github.com/comrade-tea/react-ts_tic-toe"} target={"_blank"}>sources</a>
-                        </li>
-                        <li>
-                            <a href={"https://comrade-tea.github.io/"} target={"_blank"}>other projects</a>
-                        </li>
-                    </ul>
-                </div>
-			</footer>
-        </div>
-    )
-}
+          </div>
 
-export default App;
+          <div className="rightbar">
+            <h3 className="mb-4">History:</h3>
+
+            <HistoryList
+              historyList={gameState.history}
+              historyIndex={gameState.historyIndex}
+              clickHandler={historyHandler}
+            />
+          </div>
+        </div>
+      </div>
+
+      <ResultModal
+        winnerName={gameState.winner}
+        visibility={modalActive}
+        onHideHandler={resetGame}
+      />
+
+      <Footer />
+    </div>
+  )
+}
