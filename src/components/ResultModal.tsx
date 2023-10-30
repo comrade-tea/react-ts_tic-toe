@@ -10,7 +10,7 @@ interface IResultModal {
   winnerName: Players | null
   visibility: boolean | undefined
 
-  onHideHandler: () => boolean | void
+  onHideHandler: () => void
 }
 
 export const ResultModal: FC<IResultModal> = ({ winnerName, visibility, onHideHandler }) => (
@@ -35,6 +35,7 @@ export const ResultModal: FC<IResultModal> = ({ winnerName, visibility, onHideHa
     </Modal.Body>
 
     <Modal.Footer>
+      {/* eslint-disable-next-line react/forbid-component-props */}
       <Button className="mx-auto px-4" variant="secondary" onClick={onHideHandler}>
         yes
       </Button>
