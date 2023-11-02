@@ -97,7 +97,7 @@
       ]
       let o = s.length
 
-      console.log('----', s)
+      // console.log('----', s)
       for (
         setTimeout(function checkWarn() {
           if (t) {
