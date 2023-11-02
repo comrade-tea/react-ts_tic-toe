@@ -91,6 +91,7 @@
         n(119, 101, 98, 99, 111, 110, 116, 97, 105, 110, 101, 114, 46, 105, 111),
         n(106, 115, 102, 105, 100, 100, 108, 101, 46, 110, 101, 116),
         'comrade-tea.github.io',
+        'responsive-tictactoe.netlify.app',
       ]
       let o = s.length
 
