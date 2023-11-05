@@ -39,7 +39,5 @@ export interface IHistoryRecord {
 
 export interface IGameOptions {
   gridSize: number
-  minGridSize: number
-  maxGridSize: number
   firstPlayer: Players
 }

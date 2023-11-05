@@ -4,10 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="48ccbcbc-31e2-4d96-b53b-7124f3e949e0" name="Changes" comment="">
+    <list default="true" id="48ccbcbc-31e2-4d96-b53b-7124f3e949e0" name="Changes" comment="edited footer links">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Footer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/CellGrid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/CellGrid.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/GameSettings.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/GameSettings.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/HistoryList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/HistoryList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Intro.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Intro.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ResultModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ResultModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/TodoList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/TodoList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/Models.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/Models.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/utils.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +35,9 @@
   &quot;associatedIndex&quot;: 2
 }</component>
   <component name="ProjectId" id="2Xd4CYKyEWQylGLC7zsy7MakKnJ" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -38,13 +48,14 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;D:/Work/Web_templates&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;AtomSettingsConfigurable&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;inlay.hints&quot;,
     &quot;ts.external.directory.path&quot;: &quot;D:\\playground\\tic-toe\\node_modules\\typescript\\lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -57,6 +68,11 @@
         <entry key="com.haulmont.rcb.storybook" value="false" />
       </map>
     </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\playground\tic-toe\src\" />
+    </key>
   </component>
   <component name="RunAnythingCache">
     <option name="myCommands">
@@ -101,7 +117,10 @@
       <option name="presentableId" value="Default" />
       <updated>1698945495735</updated>
       <workItem from="1698945497085" duration="2515000" />
-      <workItem from="1699011187263" duration="695000" />
+      <workItem from="1699011187263" duration="2768000" />
+      <workItem from="1699090650627" duration="19829000" />
+      <workItem from="1699178218589" duration="872000" />
+      <workItem from="1699179109742" duration="4074000" />
     </task>
     <task id="LOCAL-00001" summary="clean .idea">
       <option name="closed" value="true" />
@@ -135,7 +154,15 @@
       <option name="project" value="LOCAL" />
       <updated>1698950437693</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="edited footer links">
+      <option name="closed" value="true" />
+      <created>1699011919278</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1699011919278</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -147,6 +174,7 @@
     <MESSAGE value="clean .idea" />
     <MESSAGE value="move package to dev" />
     <MESSAGE value="edit physics lib" />
-    <option name="LAST_COMMIT_MESSAGE" value="edit physics lib" />
+    <MESSAGE value="edited footer links" />
+    <option name="LAST_COMMIT_MESSAGE" value="edited footer links" />
   </component>
 </project>
